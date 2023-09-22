@@ -3,6 +3,7 @@ package game
 import kotlin.random.Random
 
 open class Creature(val name: String, val attack: Int, var range: Int, val defense: Int, var healthPoints: Int) {
+    private var healingCount = 0
     init {
         require(healthPoints >= 0) { "Здоровье отрицательное, вы уже мертвы" }
     }
@@ -17,10 +18,16 @@ open class Creature(val name: String, val attack: Int, var range: Int, val defen
         }
     }
 
-    fun regeneration(healthPoints: Int) {
-        val healingAmount = (this.healthPoints * 0.3).toInt()
-        if (this.healthPoints + healingAmount <= this.healthPoints) {
-            this.healthPoints += healingAmount
+    fun regeneration(healthPoints: Int){
+        val maxHealth = 30
+        if(healthPoints < maxHealth && healingCount < 4){
+            val healingAmount = (maxHealth * 0.3).toInt()
+            if (healthPoints + healingAmount <= maxHealth){
+                this.healthPoints += healingAmount
+            } else {
+                this.healthPoints = maxHealth
+            }
+            healingCount++
         }
     }
 
