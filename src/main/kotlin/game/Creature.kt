@@ -1,24 +1,31 @@
 package game
-open class Creature(var attack: Int, var defense: Int, var healthpPoints: Int){
+
+import kotlin.random.Random
+
+open class Creature(val name: String, val attack: Int, var range: Int, val defense: Int, var healthPoints: Int) {
     init {
-        require(healthpPoints >= 0) { "Здоровье отрицательное, вы уже мертвы" }
+        require(healthPoints >= 0) { "Здоровье отрицательное, вы уже мертвы" }
     }
 
-    fun damageTaking(damage: Int){
-        healthpPoints -= damage
-        if (healthpPoints < 0){
-            healthpPoints = 0
+    fun damageRange(range: Int): Int {
+        return Random.nextInt(range)
+    }
+    fun damageTaking(range: Int){
+        healthPoints -= range
+        if (healthPoints < 0){
+            healthPoints = 0
         }
     }
 
-    fun regeneration() {
-        val healingAmount = (healthpPoints * 0.3).toInt()
-        if (healthpPoints + healingAmount <= healthpPoints) {
-            healthpPoints += healingAmount
+    fun regeneration(healthPoints: Int) {
+        val healingAmount = (this.healthPoints * 0.3).toInt()
+        if (this.healthPoints + healingAmount <= this.healthPoints) {
+            this.healthPoints += healingAmount
         }
     }
 
     fun isDead(): Boolean {
-        return healthpPoints == 0
+        return healthPoints == 0
     }
+
 }
