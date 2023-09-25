@@ -3,23 +3,22 @@ import game.creature.Player
 
 
 fun main() {
-    val player = Player("Player", 30,6, 20, 30)
-    val monster = Monster("Monster", 30,6, 20, 30)
+    val player = Player("Player", 15, 10, 20, 30)
+    val monster = Monster("Monster", 15, 10, 15, 30)
 
     println(player.attackMessage())
     println(monster.attackMessage())
     println()
-    // Пример боя
     while (player.healthPoints > 0 && monster.healthPoints > 0) {
-        monster.damageTaking(player)
-        player.damageTaking(monster)
-        if (player.healthPoints < 10){
-            player.regeneration(player.healthPoints)
-            println("Здоровье ${player.name} меньше 10, он воспользовался регенирацией")
+        monster.damageTaking(player, monster)
+        player.damageTaking(monster, player)
+        if (player.healthPoints < 10) {
+            player.healthRegeneration(player.healthPoints)
+            println("${player.name} имеет меньше 10 очков здоровья и воспользовался регенерацией.")
         }
     }
     when {
-        monster.isDead() -> println("${monster.name} умер! Игрок одержали победу в этом поединке!")
-        player.isDead() -> println("Игрок проиграли в этом поединке! У игрока - ${player.healthPoints} очков здоровья.")
+        monster.isDead() -> println("${monster.name} умер! Игрок одержал победу в этом поединке!")
+        player.isDead() -> println("${player.name} проиграл в этом поединке! У игрока - ${player.healthPoints} очков здоровья.")
     }
 }
