@@ -1,24 +1,34 @@
-import game.creature.Monster
-import game.creature.Player
+import game.Creature
 
 
 fun main() {
-    val player = Player("Player", 15, 10, 20, 30)
-    val monster = Monster("Monster", 15, 10, 15, 30)
+    val creature = Creature()
+    val player = creature.readPlayerInfo()
+    do {
+        var continueGame = true
+        println("Выберите действие:")
+        println("1 - Сражаться")
+        println("2 - Показать информацию о существах")
+        println("3 - Выйти из игры")
 
-    println(player.attackMessage())
-    println(monster.attackMessage())
-    println()
-    while (player.healthPoints > 0 && monster.healthPoints > 0) {
-        monster.damageTaking(player, monster)
-        player.damageTaking(monster, player)
-        if (player.healthPoints < 10) {
-            player.healthRegeneration(player.healthPoints)
-            println("${player.name} имеет меньше 10 очков здоровья и воспользовался регенерацией.")
+        val selection = readLine()
+        val monster = creature.readMonsterInfo()
+        when (selection) {
+            "1" -> {
+                creature.battle(player, monster)
+                creature.exitGame()
+            }
+
+            "2" -> {
+                creature.displayCreatureInfo(player, monster)
+            }
+
+            "3" -> {
+                creature.exitGame()
+                continueGame = false
+            }
+
+            else -> println("Некорректный выбор. Пожалуйста, выберите 1, 2 или 3.")
         }
-    }
-    when {
-        monster.isDead() -> println("${monster.name} умер! Игрок одержал победу в этом поединке!")
-        player.isDead() -> println("${player.name} проиграл в этом поединке! У игрока - ${player.healthPoints} очков здоровья.")
-    }
+    } while (continueGame)
 }

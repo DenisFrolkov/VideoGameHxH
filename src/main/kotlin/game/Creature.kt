@@ -1,65 +1,65 @@
 package game
 
+import game.creature.Monster
+import game.creature.Player
 import kotlin.random.Random
 
-open class Creature(
-    val name: String,
-    val attack: Int,
-    private var range: Int,
-    val defense: Int,
-    var healthPoints: Int
-) {
-    private var healingCount = 0
-    private val maxHealth = healthPoints
-
-    init {
-        require(healthPoints >= 0) { "Здоровье отрицательное, вы уже мертвы" }
-    }
-
-    fun damageTaking(attackerAttack: Creature, defenderDefense: Creature) {
-        val attackModifier = calculateAttackModifier(attackerAttack.attack, defenderDefense.defense)
-        val successfulHit = rollDice(attackModifier)
-        if (successfulHit) {
-            val damage = Random.nextInt(range) + 1
-            println("$name подвергся атаке ${attackerAttack.name} и получил урон в размере $damage единиц. Текущее здоровье $name: $healthPoints")
-            healthPoints -= damage
-            if (healthPoints < 0) {
-                healthPoints = 0
+class Creature {
+    fun battle(player: Player, monster: Monster) {
+        while (player.healthPoints > 0 && monster.healthPoints > 0) {
+            monster.damageTaking(player, monster)
+            player.damageTaking(monster, player)
+            if (player.healthPoints < 10) {
+                println("${player.name} имеет меньше 10 очков здоровья. Воспользоваться регенирацией? 1 - Да 2 - Нет")
+                val selection = readLine()
+                when(selection){
+                    "1" -> player.healthRegeneration(player.healthPoints)
+                }
             }
-        } else {
-            println("$name избежал атаки ${attackerAttack.name} благодаря своей защите.")
+        }
+        when {
+            monster.isDead() -> println("${monster.name} умер! ${player.name} одержал победу в этом поединке!")
+            player.isDead() -> println("${player.name} проиграл в этом поединке! У ${player.name} - ${player.healthPoints} очков здоровья.")
         }
     }
 
-    private fun calculateAttackModifier(attackerAttack: Int, defenderDefense: Int): Int {
-        val attackModifier = (attackerAttack - defenderDefense + 1)
-        return if (attackModifier < 1) 1 else attackModifier
+    fun readPlayerInfo(): Player {
+        println("Введите имя игрока:")
+        val name = readLine() ?: "Игрок"
+
+        println("Введите силу атаки игрока:")
+        val attack = readLine()?.toIntOrNull() ?: Random.nextInt(30)
+
+        println("Введите урон наносимый игрока:")
+        val range = readLine()?.toIntOrNull() ?: Random.nextInt(10)
+
+        println("Введите защиту игрока:")
+        val defense = readLine()?.toIntOrNull() ?: Random.nextInt(20)
+
+        println("Введите здоровье игрока:")
+        val healthPoints = readLine()?.toIntOrNull() ?: Random.nextInt(20)
+
+        return Player(name, attack, range, defense, healthPoints)
     }
 
-    private fun rollDice(numDice: Int): Boolean {
-        val random = Random
-        for (i in 1..numDice) {
-            val roll = random.nextInt(6) + 1
-            if (roll == 5 || roll == 6) {
-                return true
-            }
-        }
-        return false
+    fun readMonsterInfo(): Monster {
+        val name = "Монстр"
+        val attack = Random.nextInt(30)
+        val range = Random.nextInt(10)
+        val defense = Random.nextInt(20)
+        val healthPoints = Random.nextInt(20)
+
+        return Monster(name, attack, range, defense, healthPoints)
     }
 
-    fun healthRegeneration(healthPoints: Int) {
-        if (healthPoints < maxHealth && healingCount < 4) {
-            val healingAmount = (maxHealth * 0.3).toInt()
-            if (healthPoints + healingAmount <= maxHealth) {
-                this.healthPoints += healingAmount
-            } else {
-                this.healthPoints = maxHealth
-            }
-            healingCount++
-        }
+    fun displayCreatureInfo(player: Player, monster: Monster) {
+        println("Информация о существах:")
+        println(player.attackMessage())
+        println(monster.attackMessage())
     }
 
-    fun isDead(): Boolean {
-        return healthPoints == 0
+    fun exitGame() {
+        println("Программа завершена.")
+        System.exit(0)
     }
 }
